@@ -3,6 +3,8 @@ if (!require(TCGAbiolinks)) BiocManager::install("TCGAbiolinks")
 
 #What line of code needs to be added before using TCGAbiolinks?
 
+library(TCGAbiolinks)
+
 #add barcodes argument to query if you want to run on your local machine for smaller files downloaded
 #barcodes_rnaseq <- c("TCGA-BH-A0DG-01A-21R-A12P-07","TCGA-A2-A0YF-01A-21R-A109-07",
 #          "TCGA-AN-A04A-01A-21R-A034-07","TCGA-AR-A1AP-01A-11R-A12P-07",
@@ -83,14 +85,17 @@ if (!require(TCGAbiolinks)) BiocManager::install("TCGAbiolinks")
 # Use rsync to copy figure onto local system and view
 
 #######    Group 3: MAF   ###########
-# BiocManager::install("maftools")
-# library(maftools)
-# mutation <- GDCquery_Maf(tumor = "BRCA",save.csv=TRUE, pipeline="") #choose a pipeline
+BiocManager::install("maftools")
+library(maftools)
+mutation <- GDCquery_Maf(tumor = "BRCA",save.csv=TRUE, pipeline="mutect2") #choose a pipeline
 # after running ^^, navigate to the saved csv file. Open the csv file with below Code
 # only need to query once. For repeating code, you can just read in the saved dataframe you created
-# maf_dataframe <- read.csv("PATH/FILENAME.csv")
-# plotmafSummary(maf = maf_dataframe, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE, titvRaw = FALSE)
-# pdf("maf_summary.pdf")
-# dev.off()
+maf_dataframe <- read.csv("GDCdata/TCGA.BRCA.muse.b8ca5856-9819-459c-87c5-94e91aca4032.DR-10.0.somatic.maf.csv")
+
+maf_dataframe <- read.maf(maf = maf_dataframe)
+
+plotmafSummary(maf = maf_dataframe, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE, titvRaw = FALSE)
+pdf("maf_summary.pdf")
+dev.off()
 # Use rsync to copy onto local machine and view
 # Create figures from Part 7: https://bioconductor.riken.jp/packages/devel/bioc/vignettes/maftools/inst/doc/maftools.html#7_Visualization
