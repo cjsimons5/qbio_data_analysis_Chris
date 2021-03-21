@@ -1,0 +1,70 @@
+---
+title: "QBIO Public Data Analysis Group - JAJAC"
+output: html_notebook
+---
+Goal: For the top 3 genes with the most mutations, we would like to show the different types of mutations for each of these 3 genes and how they vary by age group.
+
+This code shows another way to install TCGABiolinks if you are having trouble on your local machine
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+if(!requireNamespace("devtools")) BiocManager::install(c("devtools"))
+if(!requireNamespace("robustbase"))BiocManager::install(c("robustbase"))
+library(devtools)
+library(robustbase)
+devtools::install_github("BioinformaticsFMRP/TCGAbiolinks")
+if(!requireNamespace("SummarizedExperiment"))BiocManager::install(c("SummarizedExperiment"))
+if(!requireNamespace("maftools"))BiocManager::install(c("maftools"))
+if(!requireNamespace("arsenal"))install.packages(c("arsenal"))
+if(!requireNamespace("survival"))install.packages(c("survival"))
+if(!requireNamespace("survminer"))install.packages(c("survminer"))
+```
+
+
+Libraries Used:
+```{r}
+library(TCGAbiolinks)
+library(maftools)
+library(SummarizedExperiment)
+library(arsenal)
+library(survival)
+library(survminer)
+```
+
+Query and Obtain MAF Data for BRCA patients
+```{r}
+#mutation <- GDCquery_Maf(tumor = "BRCA",save.csv=TRUE, pipeline="mutect2")
+maf_dataframe = read.maf(mutation)
+```
+
+Download or access data from TCGA. Remember you only need to download the data once. 
+The last line places all the data into a SummarizedExperiment variable called sum_exp.
+```{r}
+query <- GDCquery(project = "TCGA-BRCA",
+                   data.category = "Transcriptome Profiling",
+                   data.type = "Gene Expression Quantification",
+                   workflow.type = "HTSeq - Counts",
+                   barcode = barcodes_rnaseq)
+#GDCdownload(query) #only need this line of code ONCE to download the data
+sum_exp <- GDCprepare(query)
+
+```
+
+Get patient bar codes and age category from sum_exp
+```{r}
+patient_data <- colData(sum_exp)
+patient_ages <- patient_data$paper_age_at_initial_pathologic_diagnosis
+#here we are creating a NEW COLUMN in patient_data called "age_category"
+#NOTE: This will NOT be added to colData(sum_exp). Instead it will only be added to the patient_data data table.
+patient_data$age_category = ifelse(patient_ages < 40, "Young", ifelse(patient_ages >= 60, "Old", "Mid"))
+#The ifelse() form is: ifelse( condition, action when condition is true, action when condition is false ). Here we have two ifelse() embedded together
+
+patient_data <- patient_data[, c("barcode", "age_category")]
+
+patient_data
+
+```
+
+
+Get Oncoplot of top 3 genes
+```{r}
+oncoplot(maf = maf_dataframe, draw_titv = TRUE, top = 3)
