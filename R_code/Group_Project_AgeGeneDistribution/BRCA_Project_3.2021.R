@@ -3,19 +3,13 @@ if(!requireNamespace("devtools")) BiocManager::install(c("devtools"))
 if(!requireNamespace("robustbase"))BiocManager::install(c("robustbase"))
 library(devtools)
 library(robustbase)
-#devtools::install_github("BioinformaticsFMRP/TCGAbiolinks")
 if(!requireNamespace("SummarizedExperiment"))BiocManager::install(c("SummarizedExperiment"))
-if(!requireNamespace("maftools"))BiocManager::install(c("maftools"))
-#if(!requireNamespace("arsenal"))install.packages(c("arsenal"))
-#if(!requireNamespace("survival"))install.packages(c("survival"))
-#if(!requireNamespace("survminer"))install.packages(c("survminer"))
 
 library(TCGAbiolinks)
 library(maftools)
 library(SummarizedExperiment)
-#library(arsenal)
-#library(survival)
-#library(survminer)
+library(survival)
+library(survminer)
 
 #mutation <- GDCquery_Maf(tumor = "BRCA",save.csv=TRUE, pipeline="mutect2")
 #maf_dataframe = read.maf(mutation)
@@ -119,5 +113,6 @@ names(clinic)[names(clinic) == "days_to_last_followup"] = "days_to_last_follow_u
 age_clinical = clinic$age_at_initial_pathologic_diagnosis
 clinic$age_category = ifelse(age_clinical < 40, "Young", ifelse(age_clinical >= 60, "Old", "Mid"))
 
-
+jpeg("KMPlot.jpg")
 TCGAanalyze_survival(clinic, "age_category")
+dev.off()
