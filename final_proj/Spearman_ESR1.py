@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[28]:
+
+
+get_ipython().system('jupyter nbconvert --to script Spearman_ESR1.ipynb')
+
+
+# In[1]:
 
 
 import cptac
@@ -12,7 +18,7 @@ import seaborn as sns
 import scipy.stats as stats 
 
 
-# In[4]:
+# In[2]:
 
 
 cptac.download(dataset="Brca")
@@ -28,19 +34,19 @@ rna_data = br.get_transcriptomics()
 clinical_data = br.get_clinical()
 
 
-# In[5]:
+# In[3]:
 
 
 clinical_data["Age_in_years"] = clinical_data["Age.in.Month"]/12
 
 
-# In[6]:
+# In[4]:
 
 
 assert list(rna_data.index) == list(protein_data.index)
 
 
-# In[21]:
+# In[5]:
 
 
 rna_esr1 = rna_data.loc[: , "ESR1"]
@@ -53,13 +59,16 @@ rho_check, spear_pvalue_check = stats.spearmanr( protein_esr1, rna_esr1 )
 assert rho == rho_check
 
 
-# In[27]:
+# In[10]:
 
 
 plt.figure( figsize=(10,10) )
 
+m, b = np.polyfit(protein_esr1, rna_esr1, 1)
+
 #Replace x and y with appropriate variables
-plt.scatter( protein_esr1, rna_esr1 )
+plt.scatter( protein_esr1, rna_esr1, c='black')
+plt.plot(protein_esr1, m*protein_esr1 + b, 'g')
 
 title = "rho: {} for ESR1 (all ages)".format(rho) #This is string formatting. The variable in the () will print in the {}
 plt.title(title)
@@ -72,7 +81,7 @@ plt.ylabel("RNA Data")
 plt.savefig( "/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphALL.png", bbox_inches="tight" )
 
 
-# In[17]:
+# In[11]:
 
 
 #What column of clinical_data is referring to age?
@@ -88,16 +97,18 @@ rna_esr1_old = rna_data["ESR1"][ old_mask ]
 protein_esr1_old = protein_data["ESR1"][ old_mask ]
 
 
-# In[23]:
+# In[12]:
 
 
 #YOUNG PLOT
 rho_young, spear_pvalue_young = stats.spearmanr( rna_esr1_young, protein_esr1_young )
 
 plt.figure( figsize=(10,10) )
+m, b = np.polyfit(protein_esr1_young, rna_esr1_young, 1)
 
 #Replace x and y with appropriate variables
-plt.scatter( protein_esr1_young, rna_esr1_young )
+plt.scatter( protein_esr1_young, rna_esr1_young, c='black' )
+plt.plot(protein_esr1_young, m*protein_esr1_young + b, 'g')
 
 title = "rho: {} for ESR1 (Patients < 50 years old)".format(rho_young) #This is string formatting. The variable in the () will print in the {}
 plt.title(title)
@@ -109,16 +120,18 @@ plt.ylabel("Young RNA Data")
 plt.savefig( "/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphYOUNG.png", bbox_inches="tight" )
 
 
-# In[24]:
+# In[13]:
 
 
 #OLD PLOT
 rho_old, spear_pvalue_old = stats.spearmanr( rna_esr1_old, protein_esr1_old )
 
 plt.figure( figsize=(10,10) )
+m, b = np.polyfit(protein_esr1_old, rna_esr1_old, 1)
 
 #Replace x and y with appropriate variables
-plt.scatter( protein_esr1_old, rna_esr1_old )
+plt.scatter( protein_esr1_old, rna_esr1_old, c='black' )
+plt.plot(protein_esr1_old, m*protein_esr1_old + b, 'g')
 
 title = "rho: {} for ESR1 (Patients >= 50 years old)".format(rho_old) #This is string formatting. The variable in the () will print in the {}
 plt.title(title)
