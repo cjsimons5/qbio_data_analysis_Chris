@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[28]:
+# In[17]:
 
 
 get_ipython().system('jupyter nbconvert --to script Spearman_ESR1.ipynb')
@@ -59,13 +59,14 @@ rho_check, spear_pvalue_check = stats.spearmanr( protein_esr1, rna_esr1 )
 assert rho == rho_check
 
 
-# In[10]:
+# In[16]:
 
 
 plt.figure( figsize=(10,10) )
 
 m, b = np.polyfit(protein_esr1, rna_esr1, 1)
-
+print(m)
+print(b)
 #Replace x and y with appropriate variables
 plt.scatter( protein_esr1, rna_esr1, c='black')
 plt.plot(protein_esr1, m*protein_esr1 + b, 'g')
@@ -97,7 +98,7 @@ rna_esr1_old = rna_data["ESR1"][ old_mask ]
 protein_esr1_old = protein_data["ESR1"][ old_mask ]
 
 
-# In[12]:
+# In[14]:
 
 
 #YOUNG PLOT
@@ -105,7 +106,8 @@ rho_young, spear_pvalue_young = stats.spearmanr( rna_esr1_young, protein_esr1_yo
 
 plt.figure( figsize=(10,10) )
 m, b = np.polyfit(protein_esr1_young, rna_esr1_young, 1)
-
+print(m)
+print(b)
 #Replace x and y with appropriate variables
 plt.scatter( protein_esr1_young, rna_esr1_young, c='black' )
 plt.plot(protein_esr1_young, m*protein_esr1_young + b, 'g')
@@ -120,7 +122,7 @@ plt.ylabel("Young RNA Data")
 plt.savefig( "/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphYOUNG.png", bbox_inches="tight" )
 
 
-# In[13]:
+# In[15]:
 
 
 #OLD PLOT
@@ -128,7 +130,8 @@ rho_old, spear_pvalue_old = stats.spearmanr( rna_esr1_old, protein_esr1_old )
 
 plt.figure( figsize=(10,10) )
 m, b = np.polyfit(protein_esr1_old, rna_esr1_old, 1)
-
+print(m)
+print(b)
 #Replace x and y with appropriate variables
 plt.scatter( protein_esr1_old, rna_esr1_old, c='black' )
 plt.plot(protein_esr1_old, m*protein_esr1_old + b, 'g')
@@ -141,4 +144,23 @@ plt.ylabel("Old RNA Data")
 
 #plt.show() #Comment out when running in script
 plt.savefig( "/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphOLD.png", bbox_inches="tight" )
+
+
+# In[ ]:
+
+
+def spear_rho_plot(rna, protein, genename, figsz=10, pathout):
+    rho = stats.spearmanr(rna, protein)
+    m, b = np.polyfit(protein, rna, 1)
+    plt.figure(figsize=(figsz, figsz))
+    
+    plt.scatter(protein, rna, c="black")
+    plt.plot(protein, m*protein + b, 'g')
+    
+    title = "rho: {0} for {1}".format(rho_old, genename) #This is string formatting. The variable in the () will print in the {}
+    plt.title(title)
+    plt.xlabel("Proteomic Data")
+    plt.ylabel("RNA Data")
+    
+    plt.savefig(pathout, bbox_inches="tight" )
 
