@@ -45,4 +45,5 @@ young_maf <- subsetMaf(maf_dataframe, tsb = young_codes$Tumor_Sample_Barcode)
 old_maf <- subsetMaf(maf_dataframe, tsb = old_codes$Tumor_Sample_Barcode)
 
 jpeg("LolliPlot2OldYoung.jpeg")
-lollipopPlot2(m1=young_maf, m2=old_maf, gene="ESR1")
+lollipopPlot2(m1=young_maf, m2=old_maf, m1_name = "Young", m2_name = "Old", gene="ESR1")
+?lollipopPlot2
