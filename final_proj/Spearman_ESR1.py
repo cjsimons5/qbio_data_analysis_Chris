@@ -36,7 +36,7 @@ clinical_data = br.get_clinical()
 
 # In[3]:
 
-
+#Gets age data
 clinical_data["Age_in_years"] = clinical_data["Age.in.Month"]/12
 
 
@@ -48,7 +48,7 @@ assert list(rna_data.index) == list(protein_data.index)
 
 # In[5]:
 
-
+#shrinking down data to only include gene ESR1
 rna_esr1 = rna_data.loc[: , "ESR1"]
 protein_esr1 = protein_data.loc[: , "ESR1"]
 
@@ -62,15 +62,15 @@ assert rho == rho_check
 # In[8]:
 
 
-#What column of clinical_data is referring to age?
+#Boolean masking, using age data
 young_mask = clinical_data["Age_in_years"] < 50.0
 old_mask = clinical_data["Age_in_years"] >= 50.0
 
-#Check for understanding: Why do the below lines work?
+#Splitting into young using the mask (at row ESR1, it is only where the mask is true)
 rna_esr1_young = rna_data["ESR1"][ young_mask ]
 protein_esr1_young = protein_data["ESR1"][ young_mask ]
 
-#We want all patients of the ESR1 column
+#Splitting into old using the mask (at row ESR1, it is only where the mask is true)
 rna_esr1_old = rna_data["ESR1"][ old_mask ]
 protein_esr1_old = protein_data["ESR1"][ old_mask ]
 
@@ -79,23 +79,31 @@ protein_esr1_old = protein_data["ESR1"][ old_mask ]
 
 
 def spear_rho_plot(rna, protein, genename, pathout, figsz=10):
+    #input takes in rna expression and protein expression data, a gene name
+    #a pathway to save the plot to, and a figure size with default dimension 10
+
+    #Calculation of the spearman rho
     rho, spear_pval = stats.spearmanr(rna, protein)
+    #prepping linear fit line
     m, b = np.polyfit(protein, rna, 1)
     plt.figure(figsize=(figsz, figsz))
     
+    #plotting the data points, and plotting the line of best fit
     plt.scatter(protein, rna, c="black")
     plt.plot(protein, m*protein + b, 'g')
     
-    title = "rho: {0} for {1}".format(rho, genename) #This is string formatting. The variable in the () will print in the {}
+    title = "rho: {0} for {1}".format(rho, genename) #Puts rho correlation and genename in title of figure
     plt.title(title)
+
+    #informative labels
     plt.xlabel("Proteomic Data")
     plt.ylabel("RNA Data")
     
+    #Saves to the path put in
     plt.savefig(pathout, bbox_inches="tight" )
 
 
 # In[17]:
-
 
 out="/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphALL.png"
 spear_rho_plot(rna_esr1, protein_esr1, "ESR1",  out)
@@ -105,72 +113,3 @@ spear_rho_plot(rna_esr1_old, protein_esr1_old, "ESR1",  out)
 
 out="/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphYOUNG.png"
 spear_rho_plot(rna_esr1_young, protein_esr1_young, "ESR1",  out)
-
-
-# In[11]:
-
-
-plt.figure( figsize=(10,10) )
-
-np.polyfit(protein_esr1, rna_esr1, 1)
-print(stats.pearsonr(protein_esr1, rna_esr1))
-#Replace x and y with appropriate variables
-plt.scatter( protein_esr1, rna_esr1, c='black')
-plt.plot(protein_esr1, m*protein_esr1 + b, 'g')
-
-title = "rho: {} for ESR1 (all ages)".format(rho) #This is string formatting. The variable in the () will print in the {}
-plt.title(title)
-
-#Fill in informative x and y labels
-plt.xlabel("Proteomic Data")
-plt.ylabel("RNA Data")
-
-#plt.show() #Comment out when running in script
-plt.savefig( "/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphALL.png", bbox_inches="tight" )
-
-
-# In[14]:
-
-
-#YOUNG PLOT
-rho_young, spear_pvalue_young = stats.spearmanr( rna_esr1_young, protein_esr1_young )
-
-plt.figure( figsize=(10,10) )
-m, b = np.polyfit(protein_esr1_young, rna_esr1_young, 1)
-print(stats.pearsonr(protein_esr1_young, rna_esr1_young))
-#Replace x and y with appropriate variables
-plt.scatter( protein_esr1_young, rna_esr1_young, c='black' )
-plt.plot(protein_esr1_young, m*protein_esr1_young + b, 'g')
-
-title = "rho: {} for ESR1 (Patients < 50 years old)".format(rho_young) #This is string formatting. The variable in the () will print in the {}
-plt.title(title)
-
-plt.xlabel("Young Proteomic Data")
-plt.ylabel("Young RNA Data")
-
-#plt.show() #Comment out when running in script
-plt.savefig( "/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphYOUNG.png", bbox_inches="tight" )
-
-
-# In[15]:
-
-
-#OLD PLOT
-rho_old, spear_pvalue_old = stats.spearmanr( rna_esr1_old, protein_esr1_old )
-
-plt.figure( figsize=(10,10) )
-m, b = np.polyfit(protein_esr1_old, rna_esr1_old, 1)
-print(stats.pearsonr(protein_esr1_old, rna_esr1_old))
-#Replace x and y with appropriate variables
-plt.scatter( protein_esr1_old, rna_esr1_old, c='black' )
-plt.plot(protein_esr1_old, m*protein_esr1_old + b, 'g')
-
-title = "rho: {} for ESR1 (Patients >= 50 years old)".format(rho_old) #This is string formatting. The variable in the () will print in the {}
-plt.title(title)
-
-plt.xlabel("Old Proteomic Data")
-plt.ylabel("Old RNA Data")
-
-#plt.show() #Comment out when running in script
-plt.savefig( "/Users/Christopher/Desktop/Datanalysis/qbio_data_analysis_Chris/final_proj/SpearGraphOLD.png", bbox_inches="tight" )
-
